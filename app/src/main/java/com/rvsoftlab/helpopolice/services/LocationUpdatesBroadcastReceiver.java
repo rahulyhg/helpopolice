@@ -13,6 +13,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.LocationResult;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.body.JSONObjectBody;
+import com.koushikdutta.ion.Ion;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -47,7 +51,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    private void updateLocation(final Location location, Context context) {
+    /*private void updateLocation(final Location location, Context context) {
         try {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://rvsoft.esy.es/Android/helpo/Location.php", new Response.Listener<String>() {
                 @Override
@@ -71,6 +75,35 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                 }
             };
             Volley.newRequestQueue(context).add(stringRequest);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }*/
+
+    private void updateLocation(final Location location, Context context){
+        try {
+            JsonObject json = new JsonObject();
+            json.addProperty("tag","update_loc");
+            json.addProperty("mobile","8286903263");
+            json.addProperty("lat",String.valueOf(location.getLatitude()));
+            json.addProperty("long",String.valueOf(location.getLongitude()));
+
+            Ion.with(context)
+                    .load("http://rvsoft.esy.es/Android/helpo/Location.php")
+                    .setBodyParameter("tag","update_loc")
+                    .setBodyParameter("mobile","8286903263")
+                    .setBodyParameter("lat",String.valueOf(location.getLatitude()))
+                    .setBodyParameter("long",String.valueOf(location.getLongitude()))
+                    .asJsonObject()
+                    .setCallback(new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonObject result) {
+                            if (e!=null)
+                                e.printStackTrace();
+                            else
+                                Log.i(TAG,result.toString());
+                        }
+                    });
         }catch (Exception e){
             e.printStackTrace();
         }
