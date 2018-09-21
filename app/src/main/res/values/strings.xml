@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Helpo Police</string>
+    <string name="awareness_api_key">AIzaSyAIY8dbzUE-pnmYCGagRThX9KfOlU4_UVc</string>
+
 </resources>

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,13 +21,23 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.LocationUpdatesIntentService"
-            android:exported="false"/>
-        <receiver android:name=".services.LocationUpdatesBroadcastReceiver" android:exported="true">
+        <service
+            android:name=".services.LocationUpdatesIntentService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".services.LocationUpdatesBroadcastReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.rvsoftlab.helpopolice.services.LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES"/>
+                <action android:name="com.rvsoftlab.helpopolice.services.LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".login.LoginActivity"/>
+
+        <meta-data
+            android:name="com.google.android.awareness.API_KEY"
+            android:value="@string/awareness_api_key" />
     </application>
 
 </manifest>

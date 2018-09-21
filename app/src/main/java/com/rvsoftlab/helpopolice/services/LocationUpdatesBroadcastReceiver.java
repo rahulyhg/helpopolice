@@ -12,13 +12,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.LocationResult;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.async.http.body.JSONObjectBody;
 import com.koushikdutta.ion.Ion;
 
 import java.lang.reflect.Method;
+import java.security.acl.LastOwnerException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +43,6 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                 LocationResult result = LocationResult.extractResult(intent);
                 if (result != null) {
                     List<Location> locations = result.getLocations();
-                    /*LocationResultHelper locationResultHelper = new LocationResultHelper(
-                            context, locations);
-                    // Save the location data to SharedPreferences.
-                    locationResultHelper.saveResults();
-                    // Show notification with the location data.
-                    locationResultHelper.showNotification();*/
                     Log.i(TAG, String.valueOf(locations.get(0).getLatitude()));
                     if (!locations.isEmpty())
                         updateLocation(locations.get(0),context);
@@ -82,7 +82,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
     private void updateLocation(final Location location, Context context){
         try {
-            JsonObject json = new JsonObject();
+            /*JsonObject json = new JsonObject();
             json.addProperty("tag","update_loc");
             json.addProperty("mobile","8286903263");
             json.addProperty("lat",String.valueOf(location.getLatitude()));
@@ -103,7 +103,19 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                             else
                                 Log.i(TAG,result.toString());
                         }
-                    });
+                    });*/
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/");
+            GeoFire geoFire = new GeoFire(ref);
+            geoFire.setLocation("1234567890", new GeoLocation(location.getLatitude(), location.getLongitude()), new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                    if (error!=null){
+                        Log.d(TAG,error.toString());
+                    }else {
+                        Log.d(TAG,"Success GeoFire");
+                    }
+                }
+            });
         }catch (Exception e){
             e.printStackTrace();
         }
