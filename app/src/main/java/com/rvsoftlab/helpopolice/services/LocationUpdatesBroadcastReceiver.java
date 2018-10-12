@@ -6,28 +6,15 @@ import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.LocationResult;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.async.http.body.JSONObjectBody;
-import com.koushikdutta.ion.Ion;
+import com.rvsoftlab.helpopolice.geofire.GeoFire;
+import com.rvsoftlab.helpopolice.geofire.GeoLocation;
+import com.rvsoftlab.helpopolice.helper.SessionHelper;
 
-import java.lang.reflect.Method;
-import java.security.acl.LastOwnerException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "LUBroadcastReceiver";
@@ -35,6 +22,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     public static final String ACTION_PROCESS_UPDATES =
             "com.rvsoftlab.helpopolice.services.action" +
                     ".PROCESS_UPDATES";
+    private SessionHelper session;
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent!=null){
@@ -104,9 +92,10 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                                 Log.i(TAG,result.toString());
                         }
                     });*/
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/");
+            session = new SessionHelper(context);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/location");
             GeoFire geoFire = new GeoFire(ref);
-            geoFire.setLocation("1234567890", new GeoLocation(location.getLatitude(), location.getLongitude()), new GeoFire.CompletionListener() {
+            geoFire.setLocation(session.getUserUid(), new GeoLocation(location.getLatitude(), location.getLongitude()), new GeoFire.CompletionListener() {
                 @Override
                 public void onComplete(String key, DatabaseError error) {
                     if (error!=null){

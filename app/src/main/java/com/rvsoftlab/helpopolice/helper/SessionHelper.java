@@ -10,6 +10,8 @@ public class SessionHelper {
     private int PRIVATE_MODE = 0;
     private String PREF_NAME = "helpopolice";
 
+    private String UUID = "UUID";
+
     public SessionHelper(Context context) {
         this.context = context;
         pref = context.getSharedPreferences(PREF_NAME,PRIVATE_MODE);
@@ -21,5 +23,14 @@ public class SessionHelper {
     }
     public boolean getPermissionStatus(String permission){
         return pref.getBoolean(permission,false);
+    }
+
+    public void setUserUid(String uid){
+        editor.putString(UUID,uid);
+        editor.apply();
+    }
+
+    public String getUserUid(){
+        return pref.getString(UUID,"");
     }
 }
