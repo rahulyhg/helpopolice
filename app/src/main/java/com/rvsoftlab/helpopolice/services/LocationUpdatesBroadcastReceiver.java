@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rvsoftlab.helpopolice.geofire.GeoFire;
 import com.rvsoftlab.helpopolice.geofire.GeoLocation;
+import com.rvsoftlab.helpopolice.helper.Constants;
 import com.rvsoftlab.helpopolice.helper.SessionHelper;
 
 import java.util.List;
@@ -93,7 +94,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                         }
                     });*/
             session = new SessionHelper(context);
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/location");
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD.LOCATION);
             GeoFire geoFire = new GeoFire(ref);
             geoFire.setLocation(session.getUserUid(), new GeoLocation(location.getLatitude(), location.getLongitude()), new GeoFire.CompletionListener() {
                 @Override

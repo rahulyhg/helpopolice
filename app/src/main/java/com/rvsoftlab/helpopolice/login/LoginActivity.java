@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
@@ -20,9 +21,15 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.rvsoftlab.helpopolice.MainActivity;
 import com.rvsoftlab.helpopolice.R;
+import com.rvsoftlab.helpopolice.helper.Constants;
 import com.rvsoftlab.helpopolice.helper.SessionHelper;
+import com.rvsoftlab.helpopolice.model.User;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private SessionHelper session;
     private Activity mActivity;
+    private DatabaseReference mDatabaseRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mActivity = this;
         session = new SessionHelper(this);
-
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         btnSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,8 +120,11 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("LOG", "signInWithCredential:success");
 
                             FirebaseUser user = task.getResult().getUser();
+                            Toast.makeText(mActivity, "", Toast.LENGTH_SHORT).show();
                             session.setUserUid(user.getUid());
-                            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                            writeUserData(user);
+
+
                             // ...
                         } else {
                             // Sign in failed, display a message and update the UI
@@ -124,5 +135,21 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void writeUserData(final FirebaseUser data) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                User user = new User();
+                user.setUserID(data.getUid());
+                user.setUserName(data.getDisplayName());
+                user.setUserMobile(login.getText().toString());
+                user.setFcm(instanceIdResult.getToken());
+                mDatabaseRef.child(Constants.FIREBASE_CHILD.USER).child(data.getUid()).setValue(user);
+                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                finish();
+            }
+        });
     }
 }

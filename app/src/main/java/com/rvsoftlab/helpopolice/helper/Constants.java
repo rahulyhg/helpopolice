@@ -15,4 +15,11 @@ public class Constants {
      * delivered sooner than this interval.
      */
     public static final long MAX_WAIT_TIME = UPDATE_INTERVAL * 2;
+
+    public interface FIREBASE_CHILD{
+        String USER = "user";
+        String LOCATION = "location";
+        String HELPO_REQUEST = "request";
+        String HELP_DETAIL = "helpo";
+    }
 }
